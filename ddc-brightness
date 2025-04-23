@@ -12,8 +12,8 @@ MONITOR_NAMES=("MSI MP242" "Gigabyte M34WQ" "Samsung S24R65x")
 
 usage() {
   echo "📘 Usage:"
-  echo "  $0 --all <wert>              # Sets brightness for all displays"
-  echo "  $0 --monitor <index> <wert> # Sets brightness for display [1, 2, 3]"
+  echo "  $0 --all <value>              # Sets brightness for all displays"
+  echo "  $0 --monitor <index> <value> # Sets brightness for display [1, 2, 3]"
   echo "  $0 --list                    # Lists connected displays"
   exit 1
 }
