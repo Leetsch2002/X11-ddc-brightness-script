@@ -1,23 +1,27 @@
 #!/bin/bash
 
-# Tool für Monitorhelligkeit über ddcutil
-# by ChatGPT & leetsch2002 💡
+# ddc-brightness script
+# (c) 2025 leetsch2002
+# License: MIT
 
-BUS_LIST=(7 9 10)  # Reihenfolge = Monitor 1, 2, 3
+# DDC/CI Bus Numbers (from `ddcutil detect`)
+BUS_LIST=(7 9 10)
+
+# Optional Monitor Names (for display with --list)
 MONITOR_NAMES=("MSI MP242" "Gigabyte M34WQ" "Samsung S24R65x")
 
 usage() {
-  echo "📘 Benutzung:"
-  echo "  $0 --all <wert>              # Setzt Helligkeit für alle Monitore"
-  echo "  $0 --monitor <index> <wert> # Setzt Helligkeit für Monitor [1, 2, 3]"
-  echo "  $0 --list                    # Zeigt angeschlossene Monitore"
+  echo "📘 Usage:"
+  echo "  $0 --all <wert>              # Sets brightness for all displays"
+  echo "  $0 --monitor <index> <wert> # Sets brightness for display [1, 2, 3]"
+  echo "  $0 --list                    # Lists connected displays"
   exit 1
 }
 
 set_brightness() {
   local bus=$1
   local brightness=$2
-  echo "🔧 Setze Helligkeit auf $brightness für Bus $bus"
+  echo "Set brightness to $brightness for bus $bus"
   ddcutil --bus="$bus" setvcp 10 "$brightness"
 }
 
@@ -33,14 +37,14 @@ case "$1" in
     [[ -z $2 || -z $3 ]] && usage
     index=$(( $2 - 1 ))
     if [[ $index -lt 0 || $index -ge ${#BUS_LIST[@]} ]]; then
-      echo "❌ Ungültiger Monitorindex: $2"
+      echo "Invalid display index!: $2"
       usage
     fi
     set_brightness "${BUS_LIST[$index]}" "$3"
     ;;
 
   --list)
-    echo "🖥️ Angeschlossene Monitore:"
+    echo "Connected displays:"
     for i in "${!BUS_LIST[@]}"; do
       printf "  [%d] %s (Bus %s)\n" "$((i + 1))" "${MONITOR_NAMES[$i]}" "${BUS_LIST[$i]}"
     done
