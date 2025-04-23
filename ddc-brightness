@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Tool für Monitorhelligkeit über ddcutil
+# by ChatGPT & leetsch2002 💡
+
+BUS_LIST=(7 9 10)  # Reihenfolge = Monitor 1, 2, 3
+MONITOR_NAMES=("MSI MP242" "Gigabyte M34WQ" "Samsung S24R65x")
+
+usage() {
+  echo "📘 Benutzung:"
+  echo "  $0 --all <wert>              # Setzt Helligkeit für alle Monitore"
+  echo "  $0 --monitor <index> <wert> # Setzt Helligkeit für Monitor [1, 2, 3]"
+  echo "  $0 --list                    # Zeigt angeschlossene Monitore"
+  exit 1
+}
+
+set_brightness() {
+  local bus=$1
+  local brightness=$2
+  echo "🔧 Setze Helligkeit auf $brightness für Bus $bus"
+  ddcutil --bus="$bus" setvcp 10 "$brightness"
+}
+
+case "$1" in
+  --all)
+    [[ -z $2 ]] && usage
+    for i in "${!BUS_LIST[@]}"; do
+      set_brightness "${BUS_LIST[$i]}" "$2"
+    done
+    ;;
+
+  --monitor)
+    [[ -z $2 || -z $3 ]] && usage
+    index=$(( $2 - 1 ))
+    if [[ $index -lt 0 || $index -ge ${#BUS_LIST[@]} ]]; then
+      echo "❌ Ungültiger Monitorindex: $2"
+      usage
+    fi
+    set_brightness "${BUS_LIST[$index]}" "$3"
+    ;;
+
+  --list)
+    echo "🖥️ Angeschlossene Monitore:"
+    for i in "${!BUS_LIST[@]}"; do
+      printf "  [%d] %s (Bus %s)\n" "$((i + 1))" "${MONITOR_NAMES[$i]}" "${BUS_LIST[$i]}"
+    done
+    ;;
+
+  *)
+    usage
+    ;;
+esac
